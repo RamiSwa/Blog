@@ -122,6 +122,22 @@ CELERY_RESULT_BACKEND = 'django-db'
 ---------------------------------------------------------
 
 21. add .env
+```
+DEBUG=True
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER =
+EMAIL_HOST_PASSWORD =
+DEFAULT_FROM_EMAIL=admin@localhost
+## -----------------------
+DB_NAME= myblogdb
+DB_USER=myuser
+DB_PASSWORD=mypassword
+DB_HOST=db
+DB_PORT=5432
+```
+
 22. add gitignore:
 
 ```
@@ -362,6 +378,121 @@ networks:
 
 ```
 
+### Explain about 
+
+```
+
+Here’s a breakdown of the `docker-compose.yml` file you provided:
+
+---
+
+### **Services Section**
+This section defines individual services that make up your application.
+
+---
+
+#### **`db` Service**
+- **Purpose**: This service runs a PostgreSQL database.
+- **Details**:
+  - **`image: postgres:14`**:
+    Specifies that the service uses the official PostgreSQL image, version `14`.
+  - **`container_name: postgres_db_blog`**:
+    Names the container `postgres_db_blog` for easy identification.
+  - **`environment`**:
+    Sets the required environment variables for PostgreSQL:
+    - `POSTGRES_USER`: Username for the database.
+    - `POSTGRES_PASSWORD`: Password for the database.
+    - `POSTGRES_DB`: The name of the database to be created on initialization.
+  - **`volumes`**:
+    - Mounts the host's volume `postgres_data` to `/var/lib/postgresql/data` in the container, ensuring persistent data storage.
+  - **`networks`**:
+    - Connects the container to the `blog_network` network.
+  - **`ports`**:
+    - Maps port `5432` on the container (PostgreSQL's default port) to port `5432` on the host.
+
+---
+
+#### **`redis` Service**
+- **Purpose**: Runs a Redis server, which acts as a message broker and result backend for Celery.
+- **Details**:
+  - **`image: redis:6.2`**:
+    Uses the official Redis image, version `6.2`.
+  - **`container_name: redis_blog`**:
+    Names the container `redis_blog`.
+  - **`networks`**:
+    - Connects to the `blog_network` network.
+  - **`ports`**:
+    - Maps port `6379` on the container (Redis's default port) to port `6379` on the host.
+
+---
+
+#### **`celery` Service**
+- **Purpose**: Runs the Celery worker to execute background tasks.
+- **Details**:
+  - **`build: .`**:
+    Tells Docker to build this service using the Dockerfile in the current directory.
+  - **`container_name: celery_worker_blog`**:
+    Names the container `celery_worker_blog`.
+  - **`command: celery -A blog_project worker --loglevel=info`**:
+    Runs Celery with the application `blog_project` and logs activity with the `info` level.
+  - **`environment`**:
+    - Configures Celery to use Redis as the broker and result backend:
+      - `CELERY_BROKER_URL`: Points to the Redis broker at `redis://redis:6379/0`.
+      - `CELERY_RESULT_BACKEND`: Points to Redis for storing task results.
+  - **`depends_on`**:
+    - Specifies that this service depends on the `redis` and `db` services, ensuring they start first.
+  - **`networks`**:
+    - Connects to the `blog_network` network.
+
+---
+
+#### **`web` Service**
+- **Purpose**: Runs the Django web application.
+- **Details**:
+  - **`build`**:
+    - **`context: .`**: Tells Docker to build this service using the Dockerfile in the current directory.
+  - **`container_name: django_app_blog`**:
+    Names the container `django_app_blog`.
+  - **`command: python manage.py runserver 0.0.0.0:8000`**:
+    Runs the Django development server, binding to all interfaces on port `8000`.
+  - **`volumes`**:
+    - Mounts the current directory (`.`) into the container at `/app` for development convenience.
+  - **`ports`**:
+    - Maps port `8000` on the container to port `8000` on the host.
+  - **`depends_on`**:
+    - Specifies that this service depends on the `db` and `redis` services, ensuring they start first.
+  - **`networks`**:
+    - Connects to the `blog_network` network.
+
+---
+
+### **Volumes Section**
+- **`postgres_data`**:
+  - Creates a named volume to persist PostgreSQL data, ensuring that database content is retained even if the container is restarted or removed.
+
+---
+
+### **Networks Section**
+- **`blog_network`**:
+  - Defines a custom Docker network named `blog_network`:
+    - **`driver: bridge`**: Uses the bridge driver for network isolation and communication between containers.
+
+---
+
+### **How It Works Together**
+1. **Database (`db`)**:
+   - Provides the backend database (PostgreSQL) for the Django app.
+2. **Redis (`redis`)**:
+   - Acts as the message broker and task result backend for Celery.
+3. **Celery Worker (`celery`)**:
+   - Processes background tasks sent by the Django app using Redis as the broker.
+4. **Web App (`web`)**:
+   - Runs the Django web application and interacts with the database (`db`) and Celery worker (`celery`).
+
+This setup ensures seamless integration and communication between the components using the `blog_network`. It also leverages Docker for containerization, making the system modular and easy to manage.
+
+
+```
     ------------------------------------
 
 24. create Dockerfile:
