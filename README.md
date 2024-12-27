@@ -3,24 +3,25 @@
 
 1. virtualenv env
 2. env\scripts\activate
-3. pip install django~=5.0.4
+3. `pip install django~=5.0.4`
 4. git clone https://github.com/RamiSwa/Blog.git
 5. rename Blog core
 6. cd core
 7. admin startproject myproject .
 8. code .
 9. git add .
-11. git commit -m "Merged changes from remote branch and resolved conflicts in README.md"
-[main 1ed553c] Merged changes from remote branch and resolved conflicts in README.md
-12. git push
+11. `git commit -m "Merged changes from remote branch and resolved conflicts in README.md"
+[main 1ed553c] Merged changes from remote branch and resolved conflicts in README.md`
+12. `git push`
 
-13. git checkout -b "main-1"
-14. git push --set-upstream origin main-1
-15. pip install python-decouple
-16. pip install celery
-17. pip install redis
-18. pip install psycopg2-binary celery[redis] django-celery-results django-celery-beat:
+13. `git checkout -b "main-1"`
+14. `git push --set-upstream origin main-1`
+15. `pip install python-decouple`
+16. `pip install celery`
+17. `pip install redis`
+18. `pip install psycopg2-binary celery[redis] django-celery-results django-celery-beat` :
 
+-----------------------------------
 - The command `pip install psycopg2-binary celery[redis] django-celery-results django-celery-beat` installs several Python packages crucial for building asynchronous tasks in Django applications using Celery, with Redis as the message broker. Let's break down each package:
 
 **1. `psycopg2-binary`**
@@ -71,13 +72,14 @@ These packages work together to enable asynchronous task processing within your 
 
 By using these packages, you can improve the performance and responsiveness of your Django application by offloading time-consuming operations to background workers, making your application more efficient and scalable.
 
+-------------------------------------
 
-19. pip freeze > requirements.txt
+19. `pip freeze > requirements.txt`
 20. in settings.py add:
 
 --------------------------------------------------------
+```
 from decouple import config
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -85,10 +87,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    
+    'django.contrib.staticfiles',   
     'django_celery_results', #3rd app
-  
     'examples', # our app
 ]
 
@@ -105,7 +105,7 @@ DATABASES = {
     }
 }
 
-    STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 
 # Media settings (for file uploads)
@@ -134,11 +134,13 @@ CELERY_TASK_SERIALIZER = 'json'
 # Celery Results Backend
 CELERY_RESULT_BACKEND = 'django-db'
 
+```
 ---------------------------------------------------------
 
 21. add .env
 22. add gitignore:
-    `
+
+```
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -311,12 +313,11 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-    `
+```
 --------------------------------------------------
 
   23. create file docker-compose.yml:
-      `
-
+```
 services:
   db:
     image: postgres:14
@@ -375,12 +376,12 @@ networks:
   blog_network:
     driver: bridge
 
-      `
+```
 
     ------------------------------------
 
 24. create Dockerfile:
-    `
+```
 FROM python:3.10
 
 # Set working directory
@@ -399,12 +400,12 @@ COPY . .
 # Default command
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
-    `
+```
 
 ------------------------------------------------------
 
 25. in Folder project near settings.py create celery.py:
-    `
+```
 FROM python:3.10
 
 # Set working directory
@@ -423,7 +424,7 @@ COPY . .
 # Default command
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
-    `
+```
   -----------------------------------------------
 
   26. create 2 folders static and media
@@ -436,22 +437,22 @@ CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
   29. add examples in INSTALLED_APPS
   30. `docker-compose exec web python manage.py makemigrations`
 
-  31. compose exec web python manage.py migrate
+  31. `compose exec web python manage.py migrate`
   32. in examples add tasts.py:
 
-      `
+```
 from celery import shared_task
 
 @shared_task
 def trial_task(x, y):
     return x + y
 
-      `
+```
 
   33. run `docker-compose exec web celery -A myproject worker --loglevel=info`
   34. run with another cmd `docker-compose exec web python manage.py shell`
-  35. >>> from examples.tasks import trial_task
-  36. >>> trial_task.delay(4, 5)
+  35. >>> `from examples.tasks import trial_task`
+  36. >>> `trial_task.delay(4, 5)`
       this is results:
       ![image](https://github.com/user-attachments/assets/d810fc2b-1862-4ed2-81fd-65b02bdfb495)
       ![image](https://github.com/user-attachments/assets/66111eb2-8336-4f10-84ea-6a15cc9c8528)
