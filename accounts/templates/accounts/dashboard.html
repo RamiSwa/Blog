@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0">
+            <div class="card-body text-center">
+                <!-- Profile Picture -->
+                <img 
+                    src="{{ user.profile_picture.url }}" 
+                    alt="Profile Picture" 
+                    class="rounded-circle mb-3"
+                    style="width: 150px; height: 150px; object-fit: cover;"
+                >
+
+                <!-- Welcome Message -->
+                <h3 class="mb-3">Welcome, {{ user.username }}!</h3>
+                <p>Manage your profile, posts, and more using the navigation bar.</p>
+
+                <!-- Edit Profile Button -->
+                <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-sm mt-3">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

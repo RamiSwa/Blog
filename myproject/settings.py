@@ -39,12 +39,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+
     ###
     'django_celery_results', #3rd app
+        ###
+    'accounts', # our app
 
     
     'examples', # our app
 ]
+
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,6 +64,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'myproject.urls'
+
+
 
 TEMPLATES = [
     {
@@ -76,6 +85,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -172,3 +182,18 @@ CELERY_TASK_SERIALIZER = 'json'
 
 # Celery Results Backend
 CELERY_RESULT_BACKEND = 'django-db'
+
+
+LOGOUT_REDIRECT_URL = '/accounts/login/'  # Redirect to login page after logout
+
+
+from django.contrib.messages import constants as messages
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'secondary',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
+}
+

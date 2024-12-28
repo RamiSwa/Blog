@@ -9,6 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Install PostgreSQL client
 RUN apt-get update && apt-get install -y postgresql-client
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY . .
