@@ -43,14 +43,26 @@ INSTALLED_APPS = [
 
     ###
     'django_celery_results', #3rd app
+    'ckeditor',
+
         ###
     'accounts', # our app
+    'blog',
 
     
     'examples', # our app
 ]
 
 
+
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': 'auto',
+    },
+}
 
 
 MIDDLEWARE = [
